@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.learning</groupId>
+  <artifactId>parent-modules</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <modules>
+    <module>proto</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Use jetty-->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+        <version>${spring-boot.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-jetty</artifactId>
+        <version>2.6.6</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.eclipse.jetty.websocket</groupId>
+            <artifactId>websocket-server</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.eclipse.jetty.websocket</groupId>
+            <artifactId>javax-websocket-server-impl</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>1.7.0</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context-indexer</artifactId>
+      <version>5.3.18</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <!-- Mapper API-->
+    <dependency>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct</artifactId>
+      <version>1.4.2.Final</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct-processor</artifactId>
+      <version>1.4.2.Final</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Lombok API-->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.24</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok-mapstruct-binding</artifactId>
+      <version>0.2.0</version>
+    </dependency>
+
+    <!-- Common Utils-->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.12.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>31.1-jre</version>
+    </dependency>
+
+    <!-- Common test-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <version>2.6.6</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest</artifactId>
+      <version>2.2</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <finalName>${jar.name}</finalName>
+    <extensions>
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>1.6.2</version>
+      </extension>
+    </extensions>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.google.cloud.tools</groupId>
+          <artifactId>jib-maven-plugin</artifactId>
+          <version>3.2.1</version>
+          <configuration>
+            <to>
+              <image>${project.artifactId}</image>
+            </to>
+            <from>
+              <image>${jib.base.image}</image>
+            </from>
+            <container>
+              <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+              <mainClass>${application.class}</mainClass>
+              <jvmFlags>
+                <jvmFlag>-Djava.security.egd=file:/dev/./urandom</jvmFlag>
+                <jvmFlag>-Xshareclasses:cacheDir=/opt/java/.scc,name=fbapp,createLayer</jvmFlag>
+                <jvmFlag>-Xscmx200m</jvmFlag>
+                <jvmFlag>-Duser.timezone=UTC</jvmFlag>
+                <jvmFlag>-Xgcpolicy:balanced -Xdisableexplicitgc -Xms200m
+                  -XX:+ClassRelationshipVerifier
+                </jvmFlag>
+                <jvmFlag>-XX:+AlwaysPreTouch -Xtune:virtualized -XX:+UseContainerSupport</jvmFlag>
+                <jvmFlag>-Djdk.nio.maxCachedBufferSize=262144 -XX:+PerfDisableSharedMem
+                  -XX:MaxInlineLevel=18 -XX:MaxInlineSize=270 -XX:MaxTrivialSize=12
+                  -XX:+CompactStrings
+                </jvmFlag>
+                <jvmFlag>-Dspring.config.additional-location=/app/config/</jvmFlag>
+              </jvmFlags>
+            </container>
+            <outputPaths>
+              <tar>${outputTarget}/${project.artifactId}.tar</tar>
+            </outputPaths>
+            <extraDirectories>
+              <paths>
+                <path>
+                  <from>src</from>
+                  <into>/app/config</into>
+                  <excludes>**/*</excludes>
+                </path>
+              </paths>
+            </extraDirectories>
+          </configuration>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>buildTar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.8.1</version>
+          <configuration>
+            <debug>false</debug>
+            <optimize>true</optimize>
+            <skipMultiThreadWarning>true</skipMultiThreadWarning>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.xolstice.maven.plugins</groupId>
+          <artifactId>protobuf-maven-plugin</artifactId>
+          <version>0.6.1</version>
+          <configuration>
+            <protocArtifact>com.google.protobuf:protoc:3.21.1:exe:${os.detected.classifier}</protocArtifact>
+            <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.46.0:exe:${os.detected.classifier}
+            </pluginArtifact>
+            <pluginId>grpc-java</pluginId>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>compile</goal>
+                <goal>compile-custom</goal>
+                <goal>test-compile</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>3.2.0</version>
+          <executions>
+            <execution>
+              <id>parse-versions-for-release</id>
+              <phase>initialize</phase>
+              <goals>
+                <goal>parse-version</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>3.0.0-M6</version>
+          <dependencies>
+            <dependency>
+              <groupId>me.fabriciorby</groupId>
+              <artifactId>maven-surefire-junit5-tree-reporter</artifactId>
+              <version>0.1.0</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <properties>
+              <configurationParameters>
+                junit.jupiter.extensions.autodetection.enabled = true
+                junit.jupiter.testinstance.lifecycle.default = per_class
+                junit.jupiter.execution.parallel.enabled = true
+                junit.jupiter.execution.parallel.mode.default = concurrent
+                junit.jupiter.execution.parallel.config.strategy=fixed
+                junit.jupiter.execution.parallel.config.fixed.parallelism=8
+              </configurationParameters>
+            </properties>
+            <reportFormat>plain</reportFormat>
+            <consoleOutputReporter>
+              <disable>true</disable>
+            </consoleOutputReporter>
+            <statelessTestsetInfoReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5StatelessTestsetInfoTreeReporter"/>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.sonarsource.scanner.maven</groupId>
+        <artifactId>sonar-maven-plugin</artifactId>
+        <version>3.9.1.2184</version>
+      </plugin>
+    </plugins>
+  </build>
+
+  <properties>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <lombox.version>1.18.24</lombox.version>
+    <spring-boot.version>2.6.6</spring-boot.version>
+    <aws-java-sdk.version>1.12.225</aws-java-sdk.version>
+    <guava.version>31.0.1-jre</guava.version>
+    <commons-io.version>2.11.0</commons-io.version>
+    <spring.version>5.3.20</spring.version>
+    <sping.cloud.version>2.3.3</sping.cloud.version>
+    <opentelemetry.version>1.11.0</opentelemetry.version>
+    <jar.name>${project.artifactId}-${project.version}</jar.name>
+    <jib.base.image>ibm-semeru-runtimes:open-17-jre</jib.base.image>
+    <outputTarget>${project.build.directory}</outputTarget>
+    <application.class>com.learning.Application</application.class>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+</project>
