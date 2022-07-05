@@ -1,13 +1,12 @@
 syntax = "proto3";
 
-option java_package = "com.nttuanit.ftp.proto.userprofile";
-option java_outer_classname = "UserProfileProto";
+package com.learning.proto.userprofile;
+
 option java_multiple_files = true;
-option (common.fbServiceHost) = "user-profile-service";
+option java_package = "com.learning.proto.userprofile";
+option java_outer_classname = "UserProfileProto";
 
-import "google/api/annotations.proto";
-
-package com.nttuanit.ftp.proto.userprofile;
+import "com/learning/common.proto";
 
 service UserProfileService {
   rpc upsertUserProfile(UpsertUserProfile) returns (UserProfileResponse) {};
@@ -26,6 +25,6 @@ message UserProfile {
 }
 
 message UserProfileResponse {
-  com.nttuanit.ftp.proto.common.Status status = 1;
+  com.learning.proto.common.Status status = 1;
   UserProfile results = 2;
 }
