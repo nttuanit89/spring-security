@@ -11,7 +11,6 @@
   <modules>
     <module>proto</module>
     <module>user-profile-service</module>
-    <module>service-common</module>
   </modules>
 
   <dependencyManagement>
@@ -62,6 +61,13 @@
       <artifactId>spring-context-indexer</artifactId>
       <version>5.3.18</version>
       <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-core</artifactId>
+      <version>5.6.7.Final</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- Mapper API-->

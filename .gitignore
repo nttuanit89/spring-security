@@ -35,3 +35,6 @@ target/
 # Gradle
 .gradle/
 .idea/
+
+# lib
+common-modules/
